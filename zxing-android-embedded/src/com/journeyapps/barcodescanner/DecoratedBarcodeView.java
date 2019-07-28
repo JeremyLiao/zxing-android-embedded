@@ -25,7 +25,7 @@ import java.util.Set;
 
 /**
  * Encapsulates BarcodeView, ViewfinderView and status text.
- *
+ * <p>
  * To customize the UI, use BarcodeView and ViewfinderView directly.
  */
 public class DecoratedBarcodeView extends FrameLayout {
@@ -82,38 +82,39 @@ public class DecoratedBarcodeView extends FrameLayout {
     private void initialize(AttributeSet attrs) {
         // Get attributes set on view
         TypedArray attributes = getContext().obtainStyledAttributes(attrs, R.styleable.zxing_view);
-
         int scannerLayout = attributes.getResourceId(
-                R.styleable.zxing_view_zxing_scanner_layout, R.layout.zxing_barcode_scanner);
-
+                R.styleable.zxing_view_zxing_scanner_layout, R.layout.zxing_barcode);
         attributes.recycle();
 
         inflate(getContext(), scannerLayout, this);
 
-        barcodeView = (BarcodeView) findViewById(R.id.zxing_barcode_surface);
-
+        barcodeView = findViewById(R.id.zxing_barcode_surface);
         if (barcodeView == null) {
             throw new IllegalArgumentException(
-                "There is no a com.journeyapps.barcodescanner.BarcodeView on provided layout " +
-                "with the id \"zxing_barcode_surface\".");
+                    "There is no a com.journeyapps.barcodescanner.BarcodeView on provided layout " +
+                            "with the id \"zxing_barcode_surface\".");
         }
-
         // Pass on any preview-related attributes
         barcodeView.initializeAttributes(attrs);
 
-
-        viewFinder = (ViewfinderView) findViewById(R.id.zxing_viewfinder_view);
-
+        viewFinder = findViewById(R.id.zxing_viewfinder_view);
         if (viewFinder == null) {
             throw new IllegalArgumentException(
-                "There is no a com.journeyapps.barcodescanner.ViewfinderView on provided layout " +
-                "with the id \"zxing_viewfinder_view\".");
+                    "There is no a com.journeyapps.barcodescanner.ViewfinderView on provided layout " +
+                            "with the id \"zxing_viewfinder_view\".");
         }
-
         viewFinder.setCameraPreview(barcodeView);
 
-        // statusView is optional
-        statusView = (TextView) findViewById(R.id.zxing_status_view);
+        statusView = findViewById(R.id.zxing_status_view);
+
+        TypedArray qrAttributes = getContext().obtainStyledAttributes(attrs, R.styleable.zxing_qr_view);
+        boolean showStatus = qrAttributes.getBoolean(R.styleable.zxing_qr_view_zxing_show_status, false);
+        String statusText = qrAttributes.getString(R.styleable.zxing_qr_view_zxing_status_string);
+        qrAttributes.recycle();
+        if (statusView != null) {
+            statusView.setText(statusText);
+            statusView.setVisibility(showStatus ? VISIBLE : GONE);
+        }
     }
 
     /**
@@ -143,7 +144,7 @@ public class DecoratedBarcodeView extends FrameLayout {
         }
 
         if (intent.hasExtra(Intents.Scan.TORCH_ENABLED)) {
-            if(intent.getBooleanExtra(Intents.Scan.TORCH_ENABLED, false)) {
+            if (intent.getBooleanExtra(Intents.Scan.TORCH_ENABLED, false)) {
                 this.setTorchOn();
             }
         }
@@ -167,7 +168,7 @@ public class DecoratedBarcodeView extends FrameLayout {
 
     public void setStatusText(String text) {
         // statusView is optional when using a custom layout
-        if(statusView != null) {
+        if (statusView != null) {
             statusView.setText(text);
         }
     }
@@ -253,7 +254,7 @@ public class DecoratedBarcodeView extends FrameLayout {
 
     /**
      * Handles focus, camera, volume up and volume down keys.
-     *
+     * <p>
      * Note that this view is not usually focused, so the Activity should call this directly.
      */
     @Override

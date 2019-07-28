@@ -1,3 +1,3 @@
-include ':zxing-android-embedded'
+include ':zxing-android-embedded', ':demo'
 include ':sample'
 include ':sample-nosupport'
